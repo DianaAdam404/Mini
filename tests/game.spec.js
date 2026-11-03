@@ -125,3 +125,9 @@ test("background color changes when dark theme is toggled", async ({
     await darkThemeCheckbox.uncheck();
     await expect(body).not.toHaveClass(/dark-theme/);
 });
+
+test("game shows correct status when robot wins", async ({ page }) => {
+    const squares = page.locator(".square");
+    const robotModeCheckbox = page.locator("#robot-mode");
+    const status = page.locator(".game-status");
+});
