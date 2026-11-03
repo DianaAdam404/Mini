@@ -4,12 +4,12 @@ export const PLAYER_O = "O";
 export function Square({ value, highlight, onSquareClick }) {
     function handleContextMenu(event) {
         event.preventDefault();
-        onSquareClick(PLAYER_O);
+        onSquareClick();
     }
     return (
         <button
-            className={"square" + (highlight ? " lastcell" : "")}
-            onClick={() => onSquareClick(PLAYER_X)}
+            className={"square" + (highlight ? " last-played" : "")}
+            onClick={onSquareClick}
             onContextMenu={handleContextMenu}
         >
             {value}
