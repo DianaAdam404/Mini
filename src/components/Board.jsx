@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PLAYER_O, PLAYER_X, Square } from "./Square";
 
 const BOARD_SIDES = 3;
@@ -26,13 +26,19 @@ export function Board() {
     const [wins, setWins] = useState({ [PLAYER_X]: 0, [PLAYER_O]: 0 });
     const lastPlayer = useRef();
 
-    function handleClick(idx, player) {
-        if (player !== PLAYER_O && player !== PLAYER_X) return;
-        if (robotMode && player !== PLAYER_X) return;
-        if (!robotMode && lastPlayer.current === player) return;
+    useEffect(() => {
+        document.body.classList.toggle("dark-theme", darkTheme);
+    }, [darkTheme]);
+
+    function handleClick(idx) {
         if (status[idx] || gameOver) return;
 
-        if (!robotMode) lastPlayer.current = player;
+        const player = robotMode
+            ? PLAYER_X
+            : lastPlayer.current === PLAYER_X
+              ? PLAYER_O
+              : PLAYER_X;
+        lastPlayer.current = player;
 
         const newStatus = [...status];
         newStatus[idx] = player;
@@ -70,21 +76,21 @@ export function Board() {
         lastPlayer.current = undefined;
     }
 
-    function handleRobotModeToggle() {
-        handlePlayAgain();
-        setRobotMode((enabled) => !enabled);
-    }
-
     return (
         <main className={`app-shell${darkTheme ? " dark-theme" : ""}`}>
             <div className="outside">
-                <button
-                    className="robot-toggle"
-                    onClick={handleRobotModeToggle}
-                    aria-pressed={robotMode}
-                >
-                    {robotMode ? "Stop playing with robot" : "Play with robot"}
-                </button>
+                <label className="toggle-option">
+                    <input
+                        id="robot-mode"
+                        type="checkbox"
+                        checked={robotMode}
+                        onChange={(event) => {
+                            handlePlayAgain();
+                            setRobotMode(event.target.checked);
+                        }}
+                    />
+                    Play with robot
+                </label>
                 {robotMode && (
                     <div className="robot-hint">You are X; robot is O.</div>
                 )}
@@ -100,39 +106,39 @@ export function Board() {
                                         key={index}
                                         value={status[index]}
                                         highlight={index === lastCell}
-                                        onSquareClick={(player) =>
-                                            handleClick(index, player)
-                                        }
+                                        onSquareClick={() => handleClick(index)}
                                     />
                                 );
                             })}
                         </div>
                     ))}
                     <div className="game-status">
-                        {gameOver && winner && (
-                            <div>Game over! {winner} won</div>
-                        )}
-                        {gameOver && !winner && <div>Draw! No winner</div>}
-                        {gameOver && (
-                            <button
-                                className="reset-button"
-                                onClick={handlePlayAgain}
-                            >
-                                Reset
-                            </button>
-                        )}
+                        {gameOver && winner && `Game over! ${winner} won`}
+                        {gameOver && !winner && "Draw! No winner"}
                     </div>
+                    {gameOver && (
+                        <button
+                            className="play-again"
+                            onClick={handlePlayAgain}
+                        >
+                            Play again
+                        </button>
+                    )}
                     <div className="win-counter" aria-label="Win counts">
                         <span>X wins: {wins[PLAYER_X]}</span>
                         <span>O wins: {wins[PLAYER_O]}</span>
                     </div>
-                    <button
-                        className="theme-toggle"
-                        onClick={() => setDarkTheme((enabled) => !enabled)}
-                        aria-pressed={darkTheme}
-                    >
-                        {darkTheme ? "Világos téma" : "Sötét téma"}
-                    </button>
+                    <label className="toggle-option">
+                        <input
+                            id="dark-theme"
+                            type="checkbox"
+                            checked={darkTheme}
+                            onChange={(event) =>
+                                setDarkTheme(event.target.checked)
+                            }
+                        />
+                        Dark theme
+                    </label>
                 </div>
             </div>
         </main>
