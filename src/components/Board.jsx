@@ -1,20 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { PLAYER_O, PLAYER_X, Square } from "./Square";
+import { win_check } from "../../utils/win_check";
 
 const BOARD_SIDES = 3;
 const BOARD_INDICES = [...Array(BOARD_SIDES).keys()];
 const CELL_COUNT = BOARD_SIDES * BOARD_SIDES;
-
-const WIN_POSITIONS = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-];
 
 export function Board() {
     const [status, setStatus] = useState(new Array(CELL_COUNT).fill(undefined));
@@ -43,9 +33,9 @@ export function Board() {
         const newStatus = [...status];
         newStatus[idx] = player;
         let nextLastCell = idx;
-        let nextWinner = getWinner(newStatus);
+        let result = win_check(newStatus);
 
-        if (robotMode && !nextWinner && !newStatus.every(Boolean)) {
+        if (robotMode && !result) {
             const emptyCells = newStatus.flatMap((cell, index) =>
                 cell ? [] : [index],
             );
@@ -53,17 +43,17 @@ export function Board() {
                 emptyCells[Math.floor(Math.random() * emptyCells.length)];
             newStatus[robotCell] = PLAYER_O;
             nextLastCell = robotCell;
-            nextWinner = getWinner(newStatus);
+            result = win_check(newStatus);
         }
 
         setStatus(newStatus);
         setLastCell(nextLastCell);
-        setWinner(nextWinner);
-        setGameOver(Boolean(nextWinner) || newStatus.every(Boolean));
-        if (nextWinner) {
+        setWinner(result === "tie" ? undefined : result);
+        setGameOver(Boolean(result));
+        if (result && result !== "tie") {
             setWins((currentWins) => ({
                 ...currentWins,
-                [nextWinner]: currentWins[nextWinner] + 1,
+                [result]: currentWins[result] + 1,
             }));
         }
     }
@@ -143,18 +133,6 @@ export function Board() {
             </div>
         </main>
     );
-}
-
-function getWinner(board) {
-    const winningPosition = WIN_POSITIONS.find(([first, second, third]) => {
-        return (
-            board[first] &&
-            board[first] === board[second] &&
-            board[first] === board[third]
-        );
-    });
-
-    return winningPosition ? board[winningPosition[0]] : undefined;
 }
 
 export default Board;
