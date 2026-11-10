@@ -9,7 +9,8 @@
         "lint": "eslint .",
         "preview": "vite preview",
         "test:headless": "playwright test",
-        "test": "playwright test --headed"
+        "test": "playwright test --headed",
+        "unittest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config ./unittest/jest.config.js"
     },
     "dependencies": {
         "react": "^19.2.8",
@@ -26,6 +27,7 @@
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-react-refresh": "^0.5.6",
         "globals": "^17.12.0",
+        "jest": "^30.5.2",
         "vite": "^8.3.0"
     }
 }
